@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            margin:0;
+        }
+        #container {
+            display: flex;
+            width:80%;
+            margin:auto;
+            border: 2px solid crimson;
+        }
+
+        #input,
+        #output {
+            flex: 1;
+            margin: 5%;
+            height: 300px;
+        }
+
+        #input-text,
+        #output-text {
+            width: 90%;
+            height: 250px;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="input">
+            <select name="" id="inp_lang">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+            </select>
+            <button onclick="Translate()">Translate</button>
+            <textarea name="" id="input-text" oninput="debounce(Translate,1200)"></textarea>
+        </div>
+        <div id="output">
+            <select name="" id="out_lang">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+            </select>
+            <textarea name="" id="output-text"></textarea>
+        </div>
+    </div>
+</body>
+
+</html>
+<script>
+    function read(id) {
+        return document.querySelector(id).value;
+    }
+    let id;
+    function debounce(func,delay){
+        if(id){
+            clearTimeout(id);
+        }
+        id = setTimeout(function(){
+            func();
+        },delay)
+    }
+    async function Translate() {
+        try {
+            const inp_lang = read("#inp_lang")
+            const out_lang = read("#out_lang")
+            const input = read("#input-text");
+            const res = await fetch("https://libretranslate.de/translate", {
+                method: "POST",
+                body: JSON.stringify({
+                    q: input,
+                    source: inp_lang,
+                    target: out_lang,
+                    format: "text"
+                }),
+                headers: { "Content-Type": "application/json" }
+            });
+            let { translatedText } = await res.json()
+            let output_div = document.getElementById("output-text");
+            output_div.innerText = translatedText;
+
+        } catch (err) {
+            console.log("my error : " + err);
+        }
+    }
+
+</script>
